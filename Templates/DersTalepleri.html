@@ -1,0 +1,36 @@
+{% include 'navbar.html' %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<body>
+  {% if request.user.is_authenticated %}
+  <a href='{% url "TalepOlustur"%}'>TalepOlustur</a>
+  {% endif %}
+  {% for derstalebi in derstalepleri %}
+  <div>
+    <h5><a href="{% url 'TalepDetay' derstalebi.id %}">{{derstalebi.kullanici}} -- {{derstalebi.isim}} --
+        {{derstalebi.ders}}</a> </h5>
+    <p>{{derstalebi.talep_notu}} </p>
+    {% if derstalebi.kullanici == request.user %}
+    <a href="{% url 'TalepSil' derstalebi.id %}">Talebi Sil</a> ---
+    <a href="{% url 'TalepDuzenle' derstalebi.id %}">Talebi Düzenle</a>
+    {% else %}
+    {% if derstalebi.talep_durumu == False %}
+    <a href="{% url 'TalepKabul' derstalebi.id %}">Talebi Kabul Et</a>
+    {% else %}
+    Talep Kapandı
+    {% endif %}
+    {% endif %}
+    ------------------------------------
+  </div>
+  {% endfor %}
+
+</body>
+
+</html>
