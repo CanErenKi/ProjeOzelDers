@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import DersTalepleri,Ders, Dil, VerilebilecekDersler,Mesaj,Bildirim
+from .models import DersTalepleri,Ders, Dil, VerilebilecekDersler,Mesaj,Bildirim,Profile
 # Register your models here.
 
+admin.site.register(Profile)
 admin.site.register(DersTalepleri)
 admin.site.register(Ders)
 admin.site.register(Dil)

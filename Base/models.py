@@ -63,6 +63,30 @@ class Bildirim(models.Model):
 
   def __str__(self):
     return f"{self.icerik[0:50]}--{self.alici}"
+  
+class Profile(models.Model):
+  secenek1 = [
+    ('erkek','Erkek'),
+    ('kadin','Kadın'),
+  ]
+  secenek2 = [
+    ('ogretmen','Öğretmen'),
+    ('ogrenci','Öğrenci'),
+    ('Admin','Admin'),
+  ]
+  user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
+  kullanici_tipi = models.CharField(max_length=50,null=False, choices=secenek2)
+  bio = models.TextField(max_length=200, null=True,blank=True)
+  #profil_foto = models.ImageField(null=True,blank=True,)
+  #Profil Resmi
+  #Dogum Tarihi
+  #Tel no
+  #Adres
+  cinsiyet = models.CharField(max_length=50,choices=secenek1)
+  
+  def __str__(self):
+    return str(self.user)
+  
 
   
   
