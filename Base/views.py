@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
-from .formlar import RegisterForm , DersTalepleriForm
+from .formlar import RegisterForm, DersTalepleriForm, ProfileForm, OgrenciForm, EgitmenForm
 from .models import DersTalepleri
 
 
@@ -29,6 +29,8 @@ def login_page(request):
   context = {'sayfa': sayfa}
   return render(request, 'Log-Sign.html',context)
 
+
+
 def logout_user(request):
   logout(request)
   return redirect('Home')
@@ -37,28 +39,65 @@ def logout_user(request):
 def register_page(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
-        if form.is_valid():
-            form.save()
+        profile_form = ProfileForm(request.POST)
+        kullanici_tipi = request.POST.get('kullanici_tipi')
 
+        if form.is_valid() and profile_form.is_valid():
+            user = form.save()
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            profile.save()
+            if kullanici_tipi == 'ogrenci':
+               ogrenci_formu = OgrenciForm(request.POST)
+               if ogrenci_formu.is_valid:
+                  ogrenci = ogrenci_formu.save(commit=False)
+                  ogrenci.profile = profile
+                  ogrenci.save()
+                  egitmen_formu = EgitmenForm()
+
+            elif kullanici_tipi == 'Eğitmen':
+               egitmen_formu = EgitmenForm(request.POST)
+               if egitmen_formu.is_valid:
+                  egitmen = egitmen_formu.save(commit=False)
+                  egitmen.profile = profile
+                  egitmen.save()
+                  ogrenci_formu = OgrenciForm()           
+            login(request, user)
             return redirect('Home')  
     else:
         form = RegisterForm()
-    return render(request, 'Log-Sign.html', {'form': form})
+        profile_form = ProfileForm()
+        ogrenci_formu = OgrenciForm()
+        egitmen_formu = EgitmenForm()
+        kullanici_tipi = ''
+    context = {
+       'form': form , 
+       'profile_form': profile_form, 
+       'egitmen_formu': egitmen_formu, 
+       'ogrenci_formu': ogrenci_formu,
+       'kullanici_tipi' : kullanici_tipi
+       }
+    return render(request, 'Log-Sign.html', context)
 
 
 def MainPage(request):
   return render(request,'MainPage.html')
 
+
 def OzelDers(request):
    return render(request,'OzelDers.html')
 
+
 def biz_kimiz(request):
    return render(request,'hakkımızda.html')  
+
 
 def derstalepleri(request):
    derstalepleri = DersTalepleri.objects.all()
    context = {'derstalepleri': derstalepleri}
    return render(request, 'DersTalepleri.html',context)
+
+
 
 def TalepOlustur(request):
     if request.method == 'POST':
@@ -76,14 +115,19 @@ def TalepOlustur(request):
         form = DersTalepleriForm()
     return render(request, 'TalepOluştur.html', {'form': form})
 
+
+
 def talep_detay(request, pk):
     ders_talebi = DersTalepleri.objects.get(id=pk)
     return render(request, 'TalepDetay.html', {'ders_talebi': ders_talebi})
+
 
 def talep_sil(request, pk):
    ders_talebi = DersTalepleri.objects.get(id=pk)
    ders_talebi.delete()
    return redirect('DersTalepleri')
+
+
 
 def talep_duzenle(request, pk):
    ders_talebi = DersTalepleri.objects.get(id=pk)
@@ -103,20 +147,26 @@ def talep_duzenle(request, pk):
     
    return render(request, 'TalepOluştur.html', {'form': form})
 
+
+
 def talep_kabul(request,pk):
    ders_talebi = DersTalepleri.objects.get(id=pk)
    ders_talebi.talep_durumu = True
    ders_talebi.save()
    return redirect('DersTalepleri')
 
+
 def Matematik(request):
     return render(request, 'OzelDers.html')
+
 
 def Python(request):
     return render(request, 'OzelDers.html')
 
+
 def Fizik(request):
     return render(request, 'OzelDers.html')
+
 
 def Gitar(request):
     return render(request, 'OzelDers.html')

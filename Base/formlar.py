@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import DersTalepleri
+from .models import DersTalepleri , Profile, OgrenciProfile, EgitmenProfile
 
 
 class RegisterForm(UserCreationForm):
@@ -13,7 +13,10 @@ class RegisterForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'password1', 'password2']
 
-
+class ProfileForm(forms.ModelForm):
+     class Meta:
+        model = Profile
+        fields = ['kullanici_tipi', 'bio']
 
 class DersTalepleriForm(forms.ModelForm):
     class Meta:
@@ -24,6 +27,16 @@ class DersTalepleriForm(forms.ModelForm):
         super().__init__(*args, **kwargs)   
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class': 'form-input'})
+
+class EgitmenForm(forms.ModelForm):
+    class Meta:
+        model = EgitmenProfile
+        fields = ['dersler']
+
+class OgrenciForm(forms.ModelForm):
+    class Meta: 
+        model = OgrenciProfile
+        fields = ['seviye']
 
         
 

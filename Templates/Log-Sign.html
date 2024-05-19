@@ -97,7 +97,12 @@
         <li>{{message}}</li>
         {% endfor %}
       </ul>
-      {% endif %} {{form}}
+      {% endif %} {{form}} {{ profile_form }}
+      {% if kullanici_tipi == egitmen %}
+      {{egitmen_formu}}
+      {% elif kullanici_tipi == ogrenci %}
+      {{ ogrenci_formu }}
+      {% endif %}
       <button type="input" class="btn btn-success btn-block" style="margin-top: 10px;">Kayıt Ol</button>
     </form>
     <a href="{% url 'login' %}" style="margin-right: 15px;"> Giriş Yap</a>
