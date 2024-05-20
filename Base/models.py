@@ -5,6 +5,7 @@ from django.db.models.deletion import CASCADE, SET_NULL, SET_DEFAULT
 
 class Dil(models.Model):
   dil = models.CharField(max_length=50)
+
   def __str__(self):
     return self.dil
   
@@ -79,7 +80,7 @@ class Profile(models.Model):
   user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
   kullanici_tipi = models.CharField(max_length=50,null=False, choices=secenek2)
   bio = models.TextField(max_length=200, null=True,blank=True)
-  #profil_foto = models.ImageField(null=True,blank=True,)
+  #profil_foto = models.ImageField(upload_to='profil_pic/',null=True,blank=True,)
   #Profil Resmi
   #Dogum Tarihi
   #Tel no
@@ -98,7 +99,7 @@ class OgrenciProfile(models.Model):
     ('universite', 'Üniversite'),
     ('yukseklisans','Yüksek Lisans'),
   ]
-  profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
+  profile = models.OneToOneField(Profile, on_delete=models.CASCADE, null=True, blank=True)
   seviye = models.CharField(max_length=50, choices=choices)
   
   def __str__(self):
@@ -106,7 +107,6 @@ class OgrenciProfile(models.Model):
 
 
 class EgitmenProfile(models.Model):
-  dersler = models.ForeignKey(Ders, on_delete=CASCADE)
   profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
   
   def __str__(self):

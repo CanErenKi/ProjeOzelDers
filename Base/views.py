@@ -5,13 +5,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from .formlar import RegisterForm, DersTalepleriForm, ProfileForm, OgrenciForm, EgitmenForm
-from .models import DersTalepleri
+from .models import DersTalepleri, EgitmenProfile, OgrenciProfile
 
 
 def login_page(request):
   sayfa = 'login'
   if request.method == 'POST':
-    username = request.POST.get('username').lower()
+    username = request.POST.get('username')
     password = request.POST.get('password')
 
     try:
@@ -40,42 +40,27 @@ def register_page(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         profile_form = ProfileForm(request.POST)
-        kullanici_tipi = request.POST.get('kullanici_tipi')
-
         if form.is_valid() and profile_form.is_valid():
             user = form.save()
             profile = profile_form.save(commit=False)
             profile.user = user
-            profile.save()
-            if kullanici_tipi == 'ogrenci':
-               ogrenci_formu = OgrenciForm(request.POST)
-               if ogrenci_formu.is_valid:
-                  ogrenci = ogrenci_formu.save(commit=False)
-                  ogrenci.profile = profile
-                  ogrenci.save()
-                  egitmen_formu = EgitmenForm()
-
-            elif kullanici_tipi == 'Eğitmen':
-               egitmen_formu = EgitmenForm(request.POST)
-               if egitmen_formu.is_valid:
-                  egitmen = egitmen_formu.save(commit=False)
-                  egitmen.profile = profile
-                  egitmen.save()
-                  ogrenci_formu = OgrenciForm()           
+            profile.save() 
+            if profile.kullanici_tipi == 'egitmen':
+                d = {'profile':profile}
+                egitmen = EgitmenProfile.objects.create(**d) 
+                egitmen.save()
+            elif profile.kullanici_tipi == 'ogrenci':
+                d = {'profile':profile}
+                ogrenci = OgrenciProfile.objects.create(**d)
+                ogrenci.save()          
             login(request, user)
             return redirect('Home')  
     else:
         form = RegisterForm()
         profile_form = ProfileForm()
-        ogrenci_formu = OgrenciForm()
-        egitmen_formu = EgitmenForm()
-        kullanici_tipi = ''
     context = {
        'form': form , 
        'profile_form': profile_form, 
-       'egitmen_formu': egitmen_formu, 
-       'ogrenci_formu': ogrenci_formu,
-       'kullanici_tipi' : kullanici_tipi
        }
     return render(request, 'Log-Sign.html', context)
 
@@ -100,13 +85,16 @@ def derstalepleri(request):
 
 
 def TalepOlustur(request):
+    user = request.user
     if request.method == 'POST':
         min=request.POST.get('min_butce')
         max=request.POST.get('max_butce')
         if max >= min:
            form = DersTalepleriForm(request.POST)
            if form.is_valid():
-             form.save()
+             ders_talebi = form.save(commit=False)
+             ders_talebi.kullanici = user
+             ders_talebi.save()
              return redirect('DersTalepleri')
         else:
             messages.error(request,'Minimum bütçe aralığı maksimum bütçe aralığından büyük olamaz')

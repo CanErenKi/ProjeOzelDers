@@ -14,14 +14,31 @@ class RegisterForm(UserCreationForm):
         fields = ['username', 'email', 'password1', 'password2']
 
 class ProfileForm(forms.ModelForm):
-     class Meta:
+    secenek1 = [
+      ('erkek','Erkek'),
+      ('kadin','Kadın'),
+    ]
+    secenek2 = [
+      ('egitmen','Eğitmen'),
+      ('ogrenci','Öğrenci'),
+    ]
+    cinsiyet = forms.ChoiceField(
+      choices=secenek1,
+      widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    kullanici_tipi = forms.ChoiceField(
+      choices=secenek2,
+      widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
+    class Meta:
         model = Profile
-        fields = ['kullanici_tipi', 'bio']
+        fields = ['kullanici_tipi', 'cinsiyet']
 
 class DersTalepleriForm(forms.ModelForm):
     class Meta:
         model = DersTalepleri
-        fields = ['kullanici','isim' , 'ders' , 'talep_notu' , 'min_butce' , 'max_butce' , 'ogrenci_seviyesi']
+        fields = ['isim' , 'ders' , 'talep_notu' , 'min_butce' , 'max_butce' , 'ogrenci_seviyesi']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)   
@@ -31,7 +48,7 @@ class DersTalepleriForm(forms.ModelForm):
 class EgitmenForm(forms.ModelForm):
     class Meta:
         model = EgitmenProfile
-        fields = ['dersler']
+        exclude = ['profile']
 
 class OgrenciForm(forms.ModelForm):
     class Meta: 
